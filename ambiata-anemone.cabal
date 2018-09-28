@@ -27,7 +27,7 @@ library
                      , text                            == 1.2.*
                      , thyme                           >= 0.3        && < 0.4
                      , transformers                    >= 0.3        && < 0.6
-                     , vector                          >= 0.10       && < 0.12
+                     , vector                          >= 0.10       && < 0.13
   ghc-options:
                        -Wall
 
@@ -105,7 +105,7 @@ library
                        csrc/anemone_vint.c
 
   cc-options:
-                       -std=c99 -O3 -msse4.2 -Wall -Werror -DCABAL=1
+                       -std=c99 -O3 -msse4.2 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
 
 
 test-suite test
@@ -125,19 +125,19 @@ test-suite test
                      , ambiata-disorder-corpus
                      , ambiata-disorder-jack
                      , ambiata-p
-                     , array                           == 0.5.*
-                     , bytestring                      == 0.10.*
-                     , QuickCheck                      >= 2.8.2      && < 2.9
-                     , quickcheck-instances            == 0.3.*
-                     , text                            == 1.2.*
-                     , thyme                           >= 0.3        && < 0.4
-                     , vector                          >= 0.10       && < 0.12
+                     , array
+                     , bytestring
+                     , QuickCheck
+                     , quickcheck-instances
+                     , text
+                     , thyme
+                     , vector
 
   c-sources:
                        ctest/test_mempool.c
 
   cc-options:
-                       -std=c99 -O3 -msse4.2 -Wall -Werror -DCABAL=1
+                       -std=c99 -O3 -msse4.2 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
 
 
 benchmark bench
@@ -154,12 +154,12 @@ benchmark bench
                        base                            >= 3          && < 5
                      , ambiata-anemone
                      , ambiata-p
-                     , bytestring                      == 0.10.*
-                     , criterion                       == 1.1.*
-                     , hashable                        == 1.2.*
-                     , old-locale                      == 1.0.*
-                     , text                            == 1.2.*
-                     , thyme                           >= 0.3        && < 0.4
+                     , bytestring
+                     , criterion
+                     , hashable
+                     , old-locale
+                     , text
+                     , thyme
 
   c-sources:
                        cbench/bench_memcmp.c
@@ -167,4 +167,4 @@ benchmark bench
                        cbench/bench_strtod.c
 
   cc-options:
-                       -std=c99 -O3 -msse4.2 -Wall -Werror -DCABAL=1
+                       -std=c99 -O3 -msse4.2 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
