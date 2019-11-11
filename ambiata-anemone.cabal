@@ -9,8 +9,14 @@ category:              System
 cabal-version:         >= 1.8
 build-type:            Simple
 description:           The C standard library (libc) is rubbish and slow.
-                       We have been writing a few general purpose functions in C, for example int parsing, memory comparison, and some file-handling buffer stuff.
-                       I would like a repository where I can put different versions of these functions, with benchmarks, and quickcheck tests without muddying up Icicle, but it would have to be open source.
+                       .
+                       We have been writing a few general purpose functions in C,
+                       for example int parsing, memory comparison, and some
+                       file-handling buffer stuff.
+                       .
+                       I would like a repository where I can put different versions
+                       of these functions, with benchmarks, and quickcheck tests
+                       without muddying up Icicle, but it would have to be open source.
 
 extra-source-files:
     csrc/*.h
