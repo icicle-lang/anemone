@@ -14,9 +14,8 @@ import           Data.Array.ST (MArray, STUArray, newArray, readArray)
 import           Data.Array.Unsafe (castSTUArray)
 import qualified Data.ByteString.Char8 as Char8
 
-import           Disorder.Core.Run (ExpectedTestSpeed(..), disorderCheckEnvAll)
-import           Disorder.Jack (Property)
-import           Disorder.Jack (gamble, property, arbitrary, counterexample)
+import           Hedgehog
+import           Hedgehog.Gen.QuickCheck (arbitrary)
 
 import           P
 
@@ -24,9 +23,9 @@ import           System.IO (IO)
 
 
 prop_roundtrip_double :: Property
-prop_roundtrip_double =
-  gamble arbitrary $ \(n :: Int64) ->
-  gamble arbitrary $ \(x :: Double) ->
+prop_roundtrip_double = property $ do
+  (n :: Int64)  <- forAll arbitrary
+  (x :: Double) <- forAll arbitrary
   let
     original =
       0 + x * fromIntegral n
@@ -45,29 +44,32 @@ prop_roundtrip_double =
 
     diff_i64 =
       abs (original_i64 - roundtrip_i64)
-  in
-    counterexample "" .
-    counterexample "Roundtrip failed." .
-    counterexample "" .
-    counterexample "=== Original ===" .
-    counterexample (show original) .
-    counterexample "" .
-    counterexample "=== Intermediate ===" .
-    counterexample (Char8.unpack intermediate) .
-    counterexample "" .
-    counterexample "=== Roundtrip ===" .
-    counterexample (show roundtrip) .
-    counterexample "" .
-    counterexample "=== Original (Int64) ===" .
-    counterexample (show original_i64) .
-    counterexample "" .
-    counterexample "=== Roundtrip (Int64) ===" .
-    counterexample (show roundtrip_i64) .
-    counterexample "" .
-    counterexample "=== Diff (Int64) ===" .
-    counterexample (show diff_i64) .
-    property $
-      diff_i64 <= 1
+
+  annotate $
+    concat
+      [ ""
+      , "Roundtrip failed."
+      , ""
+      , "=== Original ==="
+      , (show original)
+      , ""
+      , "=== Intermediate ==="
+      , (Char8.unpack intermediate)
+      , ""
+      , "=== Roundtrip ==="
+      , (show roundtrip)
+      , ""
+      , "=== Original (Int64) ==="
+      , (show original_i64)
+      , ""
+      , "=== Roundtrip (Int64) ==="
+      , (show roundtrip_i64)
+      , ""
+      , "=== Diff (Int64) ==="
+      , (show diff_i64)
+      ]
+  assert $
+    diff_i64 <= 1
 
 fromDouble :: Double -> Int64
 fromDouble x =
@@ -85,4 +87,4 @@ cast x =
 return []
 tests :: IO Bool
 tests =
-  $disorderCheckEnvAll TestRunMore
+  checkParallel $$(discover)

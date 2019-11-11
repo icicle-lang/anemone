@@ -12,9 +12,8 @@ import qualified Anemone.Foreign.Mempool as Mempool
 import qualified Foreign.Marshal.Array as Marshal
 
 import            P
-import            Disorder.Core
-import            Disorder.Core.IO
 import            Test.QuickCheck
+import            Test.QuickCheck.Monadic
 import            Test.QuickCheck.Instances()
 
 import qualified  Data.List as List
@@ -58,7 +57,7 @@ prop_mempool_track_size
 prop_mempool_sanity :: Property
 prop_mempool_sanity
  = forAll (listOf megabytes) $ \sizes ->
-   testIO $ do
+  monadicIO . run $ do
     pool <- Mempool.create
     vals <- mapM (Mempool.allocBytes pool) sizes
     Mempool.free pool
@@ -70,7 +69,7 @@ prop_mempool_sanity
 prop_mempool_all_aligned :: Property
 prop_mempool_all_aligned
  = forAll (listOf iterationSizes) $ \sizes ->
-   testIO $ do
+   monadicIO . run $ do
     pool <- Mempool.create
     vals <- mapM (Mempool.allocBytes pool) sizes
     Mempool.free pool
@@ -85,7 +84,7 @@ prop_mempool_calloc
  -- generate a CSize big enough, but not too big.
  -- 2 megabytes is a bit too big to convert to a list.
  = forAll (choose (1, 1000)) $ \num_items ->
-   testIO $ do
+   monadicIO . run $ do
     pool <- Mempool.create
     arr <- Mempool.calloc pool (fromIntegral num_items)
     vals <- Marshal.peekArray num_items arr
@@ -97,7 +96,7 @@ prop_mempool_calloc
 prop_mempool_sanity_total_alloc :: Property
 prop_mempool_sanity_total_alloc
  = forAll megabytes $ \sizeToAlloc ->
-   testIO $ do
+   monadicIO . run $ do
     pool <- Mempool.create
     _ <- Mempool.allocBytes pool sizeToAlloc
     poolSize <- Mempool.totalAllocSize pool
@@ -117,5 +116,4 @@ megabytes :: Gen CSize
 megabytes = choose (0, 2 * 1024 * 1024)
 
 return []
-tests = $disorderCheckEnvAll TestRunNormal
-
+tests = $quickCheckAll

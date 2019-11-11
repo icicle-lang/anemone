@@ -11,13 +11,15 @@ import           Anemone.Foreign.Time
 import qualified Data.ByteString.Char8 as Char8
 import           Data.Thyme.Calendar (Day(..), YearMonthDay(..), gregorianValid)
 
-import           Disorder.Core.Run (ExpectedTestSpeed(..), disorderCheckEnvAll)
-import           Disorder.Jack (Property)
-import           Disorder.Jack ((===), gamble, arbitrary, choose, listOf)
+import           Hedgehog
+import qualified Hedgehog.Gen as Gen
+import qualified Hedgehog.Range as Range
+import           Hedgehog.Gen.QuickCheck (arbitrary)
 
 import           P
 
 import           Text.Printf (printf)
+import           System.IO (IO)
 
 
 mkDay :: YearMonthDay -> Either TimeError Day
@@ -29,59 +31,60 @@ mkDay ymd =
       Right day
 
 prop_parseYearMonthDay :: Property
-prop_parseYearMonthDay =
-  gamble (choose (0, 9999)) $ \y ->
-  gamble (choose (1, 12)) $ \m ->
-  gamble (choose (1, 31)) $ \d ->
-  gamble (listOf arbitrary) $ \xs ->
-    let
-      ymd =
-        YearMonthDay y m d
+prop_parseYearMonthDay = property $ do
+  y  <- forAll $ Gen.int (Range.linear 0 9999)
+  m  <- forAll $ Gen.int (Range.linear 1 12)
+  d  <- forAll $ Gen.int (Range.linear 1 31)
+  xs <- forAll $ Gen.list (Range.linear 0 100) arbitrary
+  let
+    ymd =
+      YearMonthDay y m d
 
-      eymd =
-        fmap (const (ymd, Char8.pack xs)) $ mkDay ymd
+    eymd =
+      fmap (const (ymd, Char8.pack xs)) $ mkDay ymd
 
-      str =
-        Char8.pack $ printf "%04d-%02d-%02d%s" y m d xs
-    in
-      parseYearMonthDay str === eymd
+    str =
+      Char8.pack $ printf "%04d-%02d-%02d%s" y m d xs
+
+  parseYearMonthDay str === eymd
 
 prop_parseDay :: Property
-prop_parseDay =
-  gamble (choose (0, 9999)) $ \y ->
-  gamble (choose (1, 12)) $ \m ->
-  gamble (choose (1, 31)) $ \d ->
-  gamble (listOf arbitrary) $ \xs ->
-    let
-      ymd =
-        YearMonthDay y m d
+prop_parseDay = property $ do
+  y  <- forAll $ Gen.int (Range.linear 0 9999)
+  m  <- forAll $ Gen.int (Range.linear 1 12)
+  d  <- forAll $ Gen.int (Range.linear 1 31)
+  xs <- forAll $ Gen.list (Range.linear 0 100) arbitrary
+  let
+    ymd =
+      YearMonthDay y m d
 
-      eday =
-        fmap (, Char8.pack xs) $ mkDay ymd
+    eday =
+      fmap (, Char8.pack xs) $ mkDay ymd
 
-      str =
-        Char8.pack $ printf "%04d-%02d-%02d%s" y m d xs
-    in
-      parseDay str === eday
+    str =
+      Char8.pack $ printf "%04d-%02d-%02d%s" y m d xs
+
+  parseDay str === eday
 
 prop_parseRenderError :: Property
-prop_parseRenderError =
-  gamble (choose (0, 9999)) $ \y ->
-  gamble (choose (1, 12)) $ \m ->
-  gamble (choose (1, 31)) $ \d ->
-  gamble (listOf arbitrary) $ \xs ->
-    let
-      ymd =
-        YearMonthDay y m d
+prop_parseRenderError = property $ do
+  y  <- forAll $ Gen.int (Range.linear 0 9999)
+  m  <- forAll $ Gen.int (Range.linear 1 12)
+  d  <- forAll $ Gen.int (Range.linear 1 31)
+  xs <- forAll $ Gen.list (Range.linear 0 100) arbitrary
+  let
+    ymd =
+      YearMonthDay y m d
 
-      eymd =
-        fmap (const (ymd, Char8.pack xs)) $ mkDay ymd
+    eymd =
+      fmap (const (ymd, Char8.pack xs)) $ mkDay ymd
 
-      str =
-        Char8.pack $ printf "%04d-%02d-%02d%s" y m d xs
-    in
-      first renderTimeError (parseYearMonthDay str) === first renderTimeError eymd
+    str =
+      Char8.pack $ printf "%04d-%02d-%02d%s" y m d xs
+
+  first renderTimeError (parseYearMonthDay str) === first renderTimeError eymd
 
 return []
+tests :: IO Bool
 tests =
-  $disorderCheckEnvAll TestRunMore
+  checkParallel $$(discover)

@@ -1,4 +1,4 @@
-import           Disorder.Core.Main
+import           Hedgehog.Main
 
 import qualified Test.Anemone.Foreign.Atoi
 import qualified Test.Anemone.Foreign.Hash
@@ -12,7 +12,7 @@ import qualified Test.Anemone.Roundtrip
 
 main :: IO ()
 main =
-  disorderMain
+  defaultMain
     [ Test.Anemone.Foreign.Atoi.tests
     , Test.Anemone.Foreign.Hash.tests
     , Test.Anemone.Foreign.Memcmp.tests

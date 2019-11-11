@@ -10,7 +10,6 @@ module Test.Anemone.Foreign.Atoi where
 import qualified  Anemone.Foreign.Atoi as Atoi
 
 import            P
-import            Disorder.Core
 import            Test.QuickCheck
 import            Test.QuickCheck.Instances()
 
@@ -114,4 +113,4 @@ prop_atoi_vector128_leading_zero
 
 
 return []
-tests = $disorderCheckEnvAll TestRunMore
+tests = $quickCheckAll

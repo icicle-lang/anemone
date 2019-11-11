@@ -118,17 +118,28 @@ test-suite test
   hs-source-dirs:
                        test
 
+  other-modules:
+                       Test.Anemone.Foreign.Atoi
+                       Test.Anemone.Foreign.Hash
+                       Test.Anemone.Foreign.Memcmp
+                       Test.Anemone.Foreign.Mempool
+                       Test.Anemone.Foreign.Pack
+                       Test.Anemone.Foreign.Strtod
+                       Test.Anemone.Foreign.Time
+                       Test.Anemone.Foreign.VInt
+                       Test.Anemone.Roundtrip
+
   build-depends:
                        base                            >= 3          && < 5
                      , ambiata-anemone
-                     , ambiata-disorder-core
-                     , ambiata-disorder-corpus
-                     , ambiata-disorder-jack
                      , ambiata-p
                      , array
                      , bytestring
+                     , ieee754
                      , QuickCheck
                      , quickcheck-instances
+                     , hedgehog
+                     , hedgehog-quickcheck
                      , text
                      , thyme
                      , vector

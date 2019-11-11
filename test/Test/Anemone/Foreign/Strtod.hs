@@ -6,20 +6,20 @@
 
 module Test.Anemone.Foreign.Strtod where
 
-import qualified  Anemone.Foreign.Strtod as Strtod
-import qualified  Anemone.Foreign.Segv   as Segv
+import qualified Anemone.Foreign.Strtod as Strtod
+import qualified Anemone.Foreign.Segv   as Segv
 
-import            P
-import            Disorder.Core
-import            Disorder.Core.IO
-import            Test.QuickCheck
-import            Test.QuickCheck.Instances()
+import           P
+import           Test.QuickCheck
+import           Test.QuickCheck.Monadic (monadicIO, run)
+import           Test.QuickCheck.Instances()
 
-import qualified  Data.ByteString       as B
-import qualified  Data.ByteString.Char8 as BC
+import qualified Data.ByteString       as B
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.AEq as AEq
 
-import Data.Char (isDigit)
-import Data.List (replicate, takeWhile)
+import           Data.Char (isDigit)
+import           Data.List (replicate, takeWhile)
 
 import qualified Text.Read          as Read
 
@@ -54,7 +54,7 @@ testStrtodOnInts a
    = Nothing
 
 withSegv' f a
- = testIO $ Segv.withSegv (show a) (return $ f a)
+ = monadicIO . run $ Segv.withSegv (show a) (return $ f a)
 
 prop_strtod_on_ints
  = withSegv'
@@ -67,6 +67,14 @@ testStrtodWellformed a
        bs = BC.pack a
    in (r ~~~ strtod bs)
  where
+  -- | Approximately-equal property for floats and things that look like
+  -- floats.
+  (~~~) :: (AEq.AEq a, Show a) => a -> a -> Property
+  x ~~~ y = counterexample cex prop
+    where
+      cex  = concat ["|", show x, " - ", show y, "| > ɛ"]
+      prop = x AEq.~== y
+
  -- There is a bug where zero with a very large exponent becomes Infinite!
  --
  -- > > read "0e12345678901234567890" :: Double
@@ -196,4 +204,4 @@ genWellformedZeroPrefix num_int zero_int num_frac zero_frac num_exp zero_exp
    = oneof [(("e" <>) <$> num num_exp zero_exp), return ""]
 
 return []
-tests = $disorderCheckEnvAll TestRunMore
+tests = $forAllProperties $ quickCheckWithResult (stdArgs {maxSuccess = 10000})

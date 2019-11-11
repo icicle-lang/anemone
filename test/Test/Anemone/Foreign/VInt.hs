@@ -11,9 +11,10 @@ import qualified Data.ByteString.Builder as Builder
 import qualified Data.ByteString.Lazy as Lazy
 import qualified Data.Vector.Storable as Storable
 
-import           Disorder.Core (ExpectedTestSpeed(..), disorderCheckEnvAll)
-import           Disorder.Jack (Property, gamble)
-import           Disorder.Jack (tripping, listOfN, sizedBounded, choose, arbitrary)
+import           Hedgehog
+import qualified Hedgehog.Gen as Gen
+-- import           Hedgehog.Gen.QuickCheck (arbitrary)
+import qualified Hedgehog.Range as Range
 
 import           P
 
@@ -26,18 +27,23 @@ import           Test.QuickCheck.Instances ()
 
 prop_roundtrip_vint_builder :: Property
 prop_roundtrip_vint_builder =
-  gamble sizedBounded $
-    tripping (Lazy.toStrict . Builder.toLazyByteString . bVInt) (fmap noLeftovers . decodeVInt)
+  property $ do
+    a <- forAll Gen.enumBounded
+    tripping a (Lazy.toStrict . Builder.toLazyByteString . bVInt) (fmap noLeftovers . decodeVInt)
 
 prop_roundtrip_vint :: Property
 prop_roundtrip_vint =
-  gamble sizedBounded $
-    tripping encodeVInt (fmap noLeftovers . decodeVInt)
+  property $ do
+    a <- forAll Gen.enumBounded
+    tripping a encodeVInt (fmap noLeftovers . decodeVInt)
 
 prop_roundtrip_vint_array :: Property
 prop_roundtrip_vint_array =
-  gamble (Storable.fromList <$> listOfN 1 1 sizedBounded) $ \xs ->
-    tripping encodeVIntArray (fmap noLeftovers . decodeVIntArray (Storable.length xs)) xs
+  property $ do
+    as <- forAll $ Gen.list (Range.linear 1 10000) Gen.enumBounded
+    let
+      ss = Storable.fromList as
+    tripping ss encodeVIntArray (fmap noLeftovers . decodeVIntArray (Storable.length ss))
 
 noLeftovers :: (a, ByteString) -> a
 noLeftovers (xs, bs) =
@@ -46,17 +52,19 @@ noLeftovers (xs, bs) =
   else
     Savage.error $ "prop_roundtrip_vint: unexpected leftover bytes " <> show bs
 
-xprop_unpack_safe :: Property
-xprop_unpack_safe =
-  gamble (choose (-1, 10000000)) $ \n ->
-  gamble arbitrary $ \bs ->
-    case decodeVIntArray n bs of
-      Nothing ->
-        True
-      Just _ ->
-        True
+-- prop_unpack_safe :: Property
+-- prop_unpack_safe =
+--   property $ do
+--     n  <- forAll $ Gen.int (Range.linear (-1) 10000000)
+--     bs <- forAll arbitrary
+--     assert $
+--       case decodeVIntArray n bs of
+--         Nothing ->
+--           True
+--         Just _ ->
+--           True
 
 return []
 tests :: IO Bool
 tests =
-  $disorderCheckEnvAll TestRunMore
+  checkParallel $$(discover)

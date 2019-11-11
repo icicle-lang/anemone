@@ -8,7 +8,6 @@ module Test.Anemone.Foreign.Memcmp where
 import qualified  Anemone.Foreign.Memcmp.Export as Export
 
 import            P
-import            Disorder.Core
 import            Test.QuickCheck
 import            Test.QuickCheck.Instances()
 
@@ -44,4 +43,4 @@ prop_memcmp_partial_load64
 
 
 return []
-tests = $disorderCheckEnvAll TestRunMore
+tests = $quickCheckAll
