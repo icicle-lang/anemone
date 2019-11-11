@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
 module Anemone.Foreign.Pack (
@@ -22,6 +23,7 @@ import           Foreign.Ptr
 import           GHC.ForeignPtr (mallocPlainForeignPtrBytes)
 
 import           P
+import qualified Prelude as Savage
 
 import           System.IO (IO)
 import           System.IO.Unsafe (unsafePerformIO)
@@ -54,7 +56,7 @@ pack64 xs
           pout
      case ok of
       0 -> return ()
-      _ -> fail ("Anemone.Foreign.Pack.pack64: impossible: call to c_pack64_64 failed with error code " <> show ok)
+      _ -> Savage.error ("Anemone.Foreign.Pack.pack64: impossible: call to c_pack64_64 failed with error code " <> show ok)
 
  where
   (fp, _)
