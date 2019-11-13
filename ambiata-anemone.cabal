@@ -191,3 +191,8 @@ benchmark bench
 
   cc-options:
                        -std=c99 -O3 -msse4.2 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
+
+  other-modules:
+                       Bench.Foreign.Atoi
+                       Bench.Foreign.Memcmp
+                       Bench.Foreign.Strtod
