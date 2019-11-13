@@ -1,7 +1,13 @@
+<div align="center">
+
+# Anemone
+### Ugly sea creatures
+
+[![Build Status](https://api.travis-ci.com/icicle-lang/anemone.svg?branch=master)](https://travis-ci.com/icicle-lang/anemone)
+
 ![anemone](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Haeckel_Actiniae.jpg/539px-Haeckel_Actiniae.jpg)
 
-Anemone: ugly sea creatures
-=======
+</div>
 
 We have a bunch of C functions, as well as Haskell functions for generating C code, that would benefit from being shared across projects, being benchmarked, and being tested with Quickcheck.
 This is a very simple library that packages up the C functions, allowing you to link them in to an existing Haskell project easier.
