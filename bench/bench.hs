@@ -18,11 +18,10 @@ import           Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as Char8
 import           Data.Hashable (hash)
-import           Data.Thyme (Day, YearMonthDay)
+import           Data.Thyme (Day, YearMonthDay, defaultTimeLocale)
 import qualified Data.Thyme.Format as Thyme
 
 import           System.IO (IO)
-import           System.Locale (defaultTimeLocale)
 
 import           P
 
@@ -40,11 +39,7 @@ main
 
 benchConfig :: Config
 benchConfig =
-  defaultConfig {
-      reportFile = Just "dist/build/anemone-bench.html"
-    , csvFile    = Just "dist/build/anemone-bench.csv"
-    }
-
+  defaultConfig
 
 bench_ffi :: Benchmark
 bench_ffi
