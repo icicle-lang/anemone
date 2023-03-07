@@ -3,7 +3,7 @@
 # Anemone
 ### Ugly sea creatures
 
-[![Build Status](https://api.travis-ci.com/icicle-lang/anemone.svg?branch=master)](https://travis-ci.com/icicle-lang/anemone)
+![Build Status](https://github.com/icicle-lang/anemone/actions/workflows/haskell.yml/badge.svg)
 
 ![anemone](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Haeckel_Actiniae.jpg/539px-Haeckel_Actiniae.jpg)
 
