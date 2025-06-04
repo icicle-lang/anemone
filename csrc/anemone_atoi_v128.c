@@ -1,6 +1,9 @@
+#include "anemone_atoi_v128.h"
+#if defined(__SSE4_2__)
 #include "anemone_atoi_sse.h"
-#include "anemone_atoi_sse_impl.h"
-
+#else
+#include "anemone_atoi_neon.h"
+#endif
 /*
   parse unsigned 64-bit integer.
  */
