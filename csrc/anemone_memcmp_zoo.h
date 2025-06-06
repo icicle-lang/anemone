@@ -6,9 +6,13 @@
  */
 
 #include "anemone_base.h"
-#include "anemone_sse.h"
 #include "anemone_twiddle.h"
 #include "anemone_memcmp.h"
+
+#if defined(__SSE4_2__)
+#include "anemone_sse.h"
+#endif
+
 
 ANEMONE_INLINE
 int anemone_memcmp8 (const void *as, const void *bs, size_t len)
@@ -69,12 +73,14 @@ int anemone_memcmp_partial_load64 (const void *as, const void *bs, size_t len)
 ANEMONE_INLINE
 int anemone_memcmp128_unsafe (const void *buf1, const void *buf2, size_t len)
 {
+#if defined(__SSE4_2__)
+
     /* Loop through the buffers in chunks of 16 */
     while (len > 0) {
         /* Take 16, or if this is the last chunk, the remnants */
         size_t current_chunk = (len < 16) ? len : 16;
-
         /* Load the values into registers */
+
         __m128i m1 = _mm_loadu_si128((__m128i*)buf1);
         __m128i m2 = _mm_loadu_si128((__m128i*)buf2);
 
@@ -103,6 +109,10 @@ int anemone_memcmp128_unsafe (const void *buf1, const void *buf2, size_t len)
 
     /* Got to the end with no differences */
     return 0;
+
+#else
+    return anemone_memcmp(buf1, buf2, len);
+#endif
 }
 
 
