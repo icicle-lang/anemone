@@ -72,7 +72,7 @@ library
 
   install-includes:
                        anemone_atoi.h
-                       anemone_atoi_sse.h
+                       anemone_atoi_v128.h
                        anemone_base.h
                        anemone_ffi.h
                        anemone_grisu2.h
@@ -81,14 +81,13 @@ library
                        anemone_memcmp_zoo.h
                        anemone_mempool.h
                        anemone_pack.h
-                       anemone_sse.h
                        anemone_strtod.h
                        anemone_twiddle.h
                        anemone_vint.h
 
   includes:
                        anemone_atoi.h
-                       anemone_atoi_sse.h
+                       anemone_atoi_v128.h
                        anemone_base.h
                        anemone_ffi.h
                        anemone_grisu2.h
@@ -97,14 +96,13 @@ library
                        anemone_memcmp_zoo.h
                        anemone_mempool.h
                        anemone_pack.h
-                       anemone_sse.h
                        anemone_strtod.h
                        anemone_twiddle.h
                        anemone_vint.h
 
   c-sources:
                        csrc/anemone_atoi.c
-                       csrc/anemone_atoi_sse.c
+                       csrc/anemone_atoi_v128.c
                        csrc/anemone_ffi.c
                        csrc/anemone_grisu2.c
                        csrc/anemone_hash.c
@@ -116,9 +114,26 @@ library
                        csrc/anemone_time.c
                        csrc/anemone_vint.c
 
-  cc-options:
+  if (arch(aarch64))
+    cc-options:
+                       -std=c99 -O3 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
+
+    includes:
+                        anemone_neon.h
+                        anemone_atoi_neon.h
+    install-includes:
+                        anemone_neon.h
+                        anemone_atoi_neon.h
+  else
+    cc-options:
                        -std=c99 -O3 -msse4.2 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
 
+    includes:
+                        anemone_sse.h
+                        anemone_atoi_sse.h
+    install-includes:
+                        anemone_sse.h
+                        anemone_atoi_sse.h
 
 test-suite test
   type:                exitcode-stdio-1.0
@@ -159,9 +174,12 @@ test-suite test
   c-sources:
                        ctest/test_mempool.c
 
-  cc-options:
+  if (arch(aarch64))
+    cc-options:
+                       -std=c99 -O3 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
+  else
+    cc-options:
                        -std=c99 -O3 -msse4.2 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
-
 
 benchmark bench
   type:                exitcode-stdio-1.0
@@ -189,7 +207,11 @@ benchmark bench
                        cbench/bench_atoi.c
                        cbench/bench_strtod.c
 
-  cc-options:
+  if (arch(aarch64))
+    cc-options:
+                       -std=c99 -O3 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
+  else
+    cc-options:
                        -std=c99 -O3 -msse4.2 -Wall -Werror -Wno-unused-command-line-argument -DCABAL=1
 
   other-modules:

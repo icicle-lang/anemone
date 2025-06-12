@@ -1,5 +1,9 @@
 #include "anemone_base.h"
-#include "anemone_atoi_sse_impl.h"
+#if defined(__SSE4_2__)
+#include "anemone_atoi_sse.h"
+#else
+#include "anemone_atoi_neon.h"
+#endif
 #include "anemone_strtod.h"
 
 #include <math.h>   // INFINITY, NAN
