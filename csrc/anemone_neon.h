@@ -55,14 +55,20 @@ void anemone_neon_first_nondigit_first_nonzero(
     uint8_t bytes[16];
     vst1q_u8(bytes, m);
     unsigned int nondigit = 16, nonzero = 16;
-    for (unsigned int i = 0; i < 16; ++i) {
-        if (nondigit == 16 && (bytes[i] < '0' || bytes[i] > '9')) {
-            nondigit = i;
-        }
-        if (nonzero == 16 && bytes[i] != '0') {
+
+    // Use a single iterator for both loops.
+    unsigned int i = 0;
+    for (; i < 16; ++i) {
+        if (bytes[i] != '0') {
             nonzero = i;
+            break;
         }
-        if (nondigit != 16 && nonzero != 16) break;
+    }
+    for (; i < 16; ++i) {
+        if ((bytes[i] < '0' || bytes[i] > '9')) {
+            nondigit = i;
+            break;
+        }
     }
     *out_first_nondigit = nondigit;
     *out_first_nonzero = nonzero;
